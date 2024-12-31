@@ -3,4 +3,4 @@
 その後アイコンアニメ(でむさと 様).objをメモ帳で開き6行目の
 local path=[[]]
 の[[]]の中にフォルダのパスを貼り付けてください
-例) local path=[[C:\素材\icon_anmie_v2]]
+例) local path=[[C:\素材\icon_anime_v2]]
