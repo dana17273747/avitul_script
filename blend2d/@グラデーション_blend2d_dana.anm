@@ -1,9 +1,9 @@
-@’†ŠÔF
---track0:ƒIƒtƒZƒbƒg%,0,100,50
---track1:ƒIƒtƒZƒbƒg%,0,100,0
---track2:ƒIƒtƒZƒbƒg%,0,100,0
---track3:ƒIƒtƒZƒbƒg%,0,100,0
---dialog:F1/col,a=0xff0000;‹­‚³1,b=100;F2/col,c=0xffffff;‹­‚³2,d=100;F3/col,e=0xffffff;‹­‚³3,f=100;F4/col,g=0xffffff;‹­‚³4,h=100;
+@ä¸­é–“è‰²
+--track0:ã‚ªãƒ•ã‚»ãƒƒãƒˆ%,0,100,50
+--track1:ã‚ªãƒ•ã‚»ãƒƒãƒˆ%,0,100,0
+--track2:ã‚ªãƒ•ã‚»ãƒƒãƒˆ%,0,100,0
+--track3:ã‚ªãƒ•ã‚»ãƒƒãƒˆ%,0,100,0
+--dialog:è‰²1/col,a=0xff0000;å¼·ã•1,b=100;è‰²2/col,c=0xffffff;å¼·ã•2,d=100;è‰²3/col,e=0xffffff;å¼·ã•3,f=100;è‰²4/col,g=0xffffff;å¼·ã•4,h=100;
 if dana_b2d_gradient_stops == nil then
     dana_b2d_gradient_stops = {}
 end
@@ -22,12 +22,12 @@ for i = 1, 3 do
     end
 end
 
-@üŒ`
---track0:‹­‚³,0,100,100
---track1:Šp“x,-3600,3600,0
---track2:•,0,2000,100,1
---dialog:n“_/col,a=0xffffff;n“_‹­‚³,b=100;I“_/col,c=0x000000;I“_‹­‚³,d=100;ƒuƒŒƒ“ƒh[0-28],e=4;Šg’£ƒ‚[ƒh[1~3],f=1;“_,p={0,0};
---check0:‹­‚³ŒÂ•Êİ’è,0
+@ç·šå½¢
+--track0:å¼·ã•,0,100,100
+--track1:è§’åº¦,-3600,3600,0
+--track2:å¹…,0,2000,100,1
+--dialog:å§‹ç‚¹/col,a=0xffffff;å§‹ç‚¹å¼·ã•,b=100;çµ‚ç‚¹/col,c=0x000000;çµ‚ç‚¹å¼·ã•,d=100;ãƒ–ãƒ¬ãƒ³ãƒ‰[0-28],e=4;æ‹¡å¼µãƒ¢ãƒ¼ãƒ‰[1~3],f=1;ç‚¹,p={0,0};
+--check0:å¼·ã•å€‹åˆ¥è¨­å®š,0
 
 local sin,cos,pi = math.sin, math.cos, math.pi
 local min, max = math.min, math.max
@@ -56,7 +56,7 @@ local graW = obj.track2/2
 obj.setanchor("p", 1)
 local compop = e or 0
 
--- ˆêu‚Å‚à–³Œø‚È’l‚É‚È‚é‚ÆƒNƒ‰ƒbƒVƒ…‚µ‚Ä‚µ‚Ü‚¤
+-- ä¸€ç¬ã§ã‚‚ç„¡åŠ¹ãªå€¤ã«ãªã‚‹ã¨ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã—ã¦ã—ã¾ã†
 local extendmode = extendmodes[f]
 extendmode = extendmode ~= nil and extendmode or 1
 
@@ -100,12 +100,12 @@ bl:fillAll()
 
 obj.putpixeldata(data)
 
-@•úË
---track0:‹­‚³,0,100,100
---track1:•1,0,1000,100,1
---track2:•2,0,1000,0,1
---dialog:n“_/col,a=0xffffff;n“_‹­‚³,b=100;I“_/col,c=0x000000;I“_‹­‚³,d=100;ƒuƒŒƒ“ƒh[0-28],e=4;Šg’£ƒ‚[ƒh[1-3],f=1;“_,p={0,0,0,0};
---check0:‹­‚³ŒÂ•Êİ’è,0
+@æ”¾å°„
+--track0:å¼·ã•,0,100,100
+--track1:å¹…1,0,1000,100,1
+--track2:å¹…2,0,1000,0,1
+--dialog:å§‹ç‚¹/col,a=0xffffff;å§‹ç‚¹å¼·ã•,b=100;çµ‚ç‚¹/col,c=0x000000;çµ‚ç‚¹å¼·ã•,d=100;ãƒ–ãƒ¬ãƒ³ãƒ‰[0-28],e=4;æ‹¡å¼µãƒ¢ãƒ¼ãƒ‰[1-3],f=1;ç‚¹,p={0,0,0,0};
+--check0:å¼·ã•å€‹åˆ¥è¨­å®š,0
 
 local min, max = math.min, math.max
 local alpha = function(v)
@@ -132,7 +132,7 @@ local graW1 = obj.track1
 local graW2 = obj.track2
 obj.setanchor("p", 2)
 local compop = e or 0
--- ˆêu‚Å‚à–³Œø‚È’l‚É‚È‚é‚ÆƒNƒ‰ƒbƒVƒ…‚µ‚Ä‚µ‚Ü‚¤
+-- ä¸€ç¬ã§ã‚‚ç„¡åŠ¹ãªå€¤ã«ãªã‚‹ã¨ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã—ã¦ã—ã¾ã†
 local extendmode = extendmodes[f]
 extendmode = extendmode ~= nil and extendmode or 1
 
@@ -178,12 +178,12 @@ bl:fillAll()
 obj.putpixeldata(data)
 
 
-@‰~
---track0:‹­‚³,0,100,100
---track1:Šp“x,-3600,3600,0
---track2:ŒJ‚è•Ô‚µ,0,100,1
---dialog:n“_/col,a=0xffffff;n“_‹­‚³,b=100;I“_/col,c=0x000000;I“_‹­‚³,d=100;ƒuƒŒƒ“ƒh[0-28],e=5;“_,p={0,0};
---check0:‹­‚³ŒÂ•Êİ’è,0
+@å††éŒ
+--track0:å¼·ã•,0,100,100
+--track1:è§’åº¦,-3600,3600,0
+--track2:ç¹°ã‚Šè¿”ã—,0,100,1
+--dialog:å§‹ç‚¹/col,a=0xffffff;å§‹ç‚¹å¼·ã•,b=100;çµ‚ç‚¹/col,c=0x000000;çµ‚ç‚¹å¼·ã•,d=100;ãƒ–ãƒ¬ãƒ³ãƒ‰[0-28],e=4;ç‚¹,p={0,0};
+--check0:å¼·ã•å€‹åˆ¥è¨­å®š,0
 local pi = math.pi
 local min, max = math.min, math.max
 local alpha = function(v)
@@ -249,11 +249,11 @@ bl:fillAll()
 
 obj.putpixeldata(data)
 
-@’†ŠÔ“§–¾“x
---track0:ƒIƒtƒZƒbƒg%,0,100,50
---track1:“§–¾“x,0,100,50
---track2:ƒIƒtƒZƒbƒg%,0,100,0
---track3:“§–¾“x,0,100,0
+@ä¸­é–“é€æ˜åº¦
+--track0:ã‚ªãƒ•ã‚»ãƒƒãƒˆ%,0,100,50
+--track1:é€æ˜åº¦,0,100,50
+--track2:ã‚ªãƒ•ã‚»ãƒƒãƒˆ%,0,100,0
+--track3:é€æ˜åº¦,0,100,0
 if dana_b2d_opacity_gradient_stops == nil then
     dana_b2d_opacity_gradient_stops = {}
 end
@@ -272,12 +272,12 @@ for i = 0, 2, 2 do
     end
 end
 
-@üŒ`_“§–¾“x
---track0:ŠJn“§–¾“x,0,100,0
---track1:I—¹“§–¾“x,0,100,100
---track2:Šp“x,-3600,3600,0
---track3:•,0,2000,100,1
---dialog:Šg’£ƒ‚[ƒh[1~3],f=1;“_,p={0,0};
+@ç·šå½¢_é€æ˜åº¦
+--track0:é–‹å§‹é€æ˜åº¦,0,100,0
+--track1:çµ‚äº†é€æ˜åº¦,0,100,100
+--track2:è§’åº¦,-3600,3600,0
+--track3:å¹…,0,2000,100,1
+--dialog:æ‹¡å¼µãƒ¢ãƒ¼ãƒ‰[1~3],f=1;ç‚¹,p={0,0};
 
 local sin,cos,pi = math.sin, math.cos, math.pi
 local opacity = function(a)
@@ -303,7 +303,7 @@ local graW = obj.track3/2
 obj.setanchor("p", 1)
 local compop = 7
 
--- ˆêu‚Å‚à–³Œø‚È’l‚É‚È‚é‚ÆƒNƒ‰ƒbƒVƒ…‚µ‚Ä‚µ‚Ü‚¤
+-- ä¸€ç¬ã§ã‚‚ç„¡åŠ¹ãªå€¤ã«ãªã‚‹ã¨ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã—ã¦ã—ã¾ã†
 local extendmode = extendmodes[f]
 extendmode = extendmode ~= nil and extendmode or 1
 
@@ -340,12 +340,12 @@ bl:fillAll()
 
 obj.putpixeldata(data)
 
-@•úË_“§–¾“x
---track0:ŠJn“§–¾“x,0,100,0
---track1:I—¹“§–¾“x,0,100,100
---track2:•1,0,1000,100,1
---track3:•2,0,1000,0,1
---dialog:Šg’£ƒ‚[ƒh[1-3],f=1;“_,p={0,0,0,0};
+@æ”¾å°„_é€æ˜åº¦
+--track0:é–‹å§‹é€æ˜åº¦,0,100,0
+--track1:çµ‚äº†é€æ˜åº¦,0,100,100
+--track2:å¹…1,0,1000,100,1
+--track3:å¹…2,0,1000,0,1
+--dialog:æ‹¡å¼µãƒ¢ãƒ¼ãƒ‰[1-3],f=1;ç‚¹,p={0,0,0,0};
 
 local opacity = function(a)
     return 0x1000000 * math.floor(0xff * (1 - a / 100))
@@ -370,7 +370,7 @@ local graW2 = obj.track3
 obj.setanchor("p", 2)
 local compop = 7
 
--- ˆêu‚Å‚à–³Œø‚È’l‚É‚È‚é‚ÆƒNƒ‰ƒbƒVƒ…‚µ‚Ä‚µ‚Ü‚¤
+-- ä¸€ç¬ã§ã‚‚ç„¡åŠ¹ãªå€¤ã«ãªã‚‹ã¨ã‚¯ãƒ©ãƒƒã‚·ãƒ¥ã—ã¦ã—ã¾ã†
 local extendmode = extendmodes[f]
 extendmode = extendmode ~= nil and extendmode or 1
 
@@ -408,12 +408,12 @@ bl:fillAll()
 obj.putpixeldata(data)
 
 
-@‰~_“§–¾“x
---track0:ŠJn“§–¾“x,0,100,0
---track1:I—¹“§–¾“x,0,100,100
---track2:Šp“x,-3600,3600,0
---track3:ŒJ‚è•Ô‚µ,0,100,1
---dialog:“_,p={0,0};
+@å††éŒ_é€æ˜åº¦
+--track0:é–‹å§‹é€æ˜åº¦,0,100,0
+--track1:çµ‚äº†é€æ˜åº¦,0,100,100
+--track2:è§’åº¦,-3600,3600,0
+--track3:ç¹°ã‚Šè¿”ã—,0,100,1
+--dialog:ç‚¹,p={0,0};
 local pi = math.pi
 local opacity = function(a)
     return 0x1000000 * math.floor(0xff * (1 - a / 100))
