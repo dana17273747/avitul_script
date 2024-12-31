@@ -1,0 +1,7 @@
+以下のファイルは必須です
+いずれか一つのスクリプトのみを利用する場合でも
+同じフォルダに配置する必要があります
+blend2d.dll
+blend2d.lua
+blend2d_aviutl.lua
+bez.lua
