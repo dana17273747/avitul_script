@@ -1,0 +1,91 @@
+--track0:窓サイズ,0,2000,500,1
+--track1:縁サイズ,0,500,10,1
+--track2:縁ぼかし,0,300,0,1
+--track3:縁縦横比,-100,100,0
+--dialog:縁色/col,local futi=0x000000;図形の種類/fig,local fig="円";図形の色/col,local color=0xffffff;背景レイヤー,local back=0;窓内座標,pos={0,0};縁ずらしX,local zx=0;縁ずらしY,local zy=0;
+
+local wins = obj.track0
+local futs = obj.track1
+local futb = obj.track2
+local futr = obj.track3
+local futi = futi ~= nil and futi or 0x000000
+local fig = fig ~= nil and fig or "円"
+local back = back ~= nil and back or 0
+local zx = zx ~= nil and zx or 0
+local zy = zy ~= nil and zy or 0
+
+if wins == 0 then
+    obj.setoption("draw_state", true)
+    return
+end
+
+obj.setanchor("pos", 1)
+
+--obj.load()で各種値が失われるので退避
+local ox,oy,oz,rx,ry,rz = obj.ox,obj.oy,obj.oz,obj.rx,obj.ry,obj.rz
+
+obj.copybuffer("cache:body","obj")
+
+obj.load("figure", fig, color, wins)
+
+--追加された図形の場合に指定したサイズで描画するため
+local w,h = obj.getpixel()
+local zoom = wins/w
+--下地の図形を描画
+obj.setoption("drawtarget", "tempbuffer",wins, wins)
+obj.draw(0,0,0, zoom)
+
+if back ~= 0 then
+    obj.copybuffer("cache:tmp", "tmp")
+    obj.load("layer", back, true)
+    obj.copybuffer("cache:back_tmp", "obj")
+    obj.copybuffer("tmp", "cache:tmp")
+    obj.copybuffer("obj", "cache:back_tmp")
+    obj.draw()
+end
+
+--本体を描画
+obj.copybuffer("obj", "cache:body")
+obj.draw((ox + pos[1]) / zoom, (oy + pos[2]) / zoom, oz, 1/zoom, 1, rx, ry, rz)
+
+--図形の外を消す
+obj.load("figure", fig, color, wins)
+obj.effect("反転", "透明度反転", 1)
+obj.setoption("blend", "alpha_sub")
+obj.draw(0,0,0, zoom)
+
+if futs == 0 and futb == 0 then
+    obj.copybuffer("obj", "tmp")
+    return
+else
+    obj.copybuffer("cache:futinashi", "tmp")
+    obj.setoption("blend", 0)
+end
+
+obj.load("figure", fig, futi, wins + 2*futs)
+w,h = obj.getpixel()
+zoom = (wins + 2*futs)/w
+obj.effect("ぼかし", "範囲", futb/zoom, "縦横比", futr)
+local futw,futh
+futw = wins + 2*futs
+futh = futw
+if futr < 0 then
+    debug_print("futw, futh: "..futw..", "..futh)
+    futw = futw + 2*futb/zoom * (1+futr/100)
+    futh = futh + 2*futb/zoom
+    debug_print("futw, futh: "..futw..", "..futh)
+else
+    futw = futw + 2*futb/zoom
+    futh = futh + 2*futb/zoom * (1-futr/100)
+    debug_print("futw, futh: "..futw..", "..futh)
+end
+
+obj.setoption("drawtarget", "tempbuffer",futw + math.abs(zx), futh + math.abs(zy))
+obj.draw(zx/2,zy/2,0, zoom)
+
+obj.copybuffer("obj", "cache:futinashi")
+obj.draw(-zx/2,-zy/2,0)
+
+obj.copybuffer("obj", "tmp")
+obj.ox = zx/2
+obj.oy = zy/2

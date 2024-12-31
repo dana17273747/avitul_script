@@ -1,0 +1,126 @@
+--track0:周期,0.1,10,0.5
+--track1:オフセット,0,10,0
+--dialog:変化前,a={};変化後,b={};分割数,c=32
+
+local sqrt = math.sqrt
+
+-- 点1->点2のベクトル*t
+local tovec = function(x1, y1, x2, y2, t)
+    return t * (x2 - x1), t * (y2 - y1)
+end
+
+-- 内分点
+local dividingPoint = function(x1, y1, x2, y2, t)
+    return x1 * (1 - t) + x2 * t, y1 * (1 - t) + y2 * t
+end
+
+--点1~3から成るベジエ曲線のtの位置
+local bez2d = function(x1, y1, x2, y2, x3, y3, t)
+    local tpx1, tpy1 = tovec(x1, y1, x2, y2, t)
+    local tpx2, tpy2 = tovec(x2, y2, x3, y3, t)
+    tpx1, tpy1 = tpx1 + x1, tpy1 + y1
+    tpx2, tpy2 = tpx2 + x2, tpy2 + y2
+    local x, y = tovec(tpx1, tpy1, tpx2, tpy2, t)
+    return x + tpx1, y + tpy1
+end
+
+-- ベクトルの正規化
+local normalizeVector = function(x, y)
+    local size = sqrt(x * x + y * y)
+    return x / size, y / size
+end
+
+-- ベジエ曲線のtにおける正規化された接線ベクトル
+local normalizedTangentVector = function(x0, y0, x1, y1, x2, y2, t)
+    local dx_dt = 2 * (1 - t) * (x1 - x0) + 2 * t * (x2 - x1)
+    local dy_dt = 2 * (1 - t) * (y1 - y0) + 2 * t * (y2 - y1)
+    return normalizeVector(dx_dt, dy_dt)
+end
+
+-- 点の数
+local pn = 3
+-- 描画の分割数
+local dn = c
+
+local t = 0.5 + math.sin((obj.time + obj.track1) / obj.track0 * math.pi) / 2
+
+if #a == 0 then
+    a = { -obj.w / 2, -obj.h / 2, 0, 0, 0, obj.h / 2 }
+end
+if #b == 0 then
+    b = { obj.w / 2, -obj.h / 2, 0, 0, 0, obj.h / 2 }
+end
+
+obj.setanchor("a", pn, "line")
+obj.setanchor("b", pn, "line")
+
+local zoom = obj.getvalue("zoom") / 100
+obj.setoption("drawtarget", "tempbuffer", obj.screen_w / zoom, obj.screen_h / zoom)
+obj.setoption("blend", "alpha_max")
+
+local px = {}
+local py = {}
+for i = 1, pn do
+    px[i], py[i] = dividingPoint(a[2 * i - 1], a[2 * i], b[2 * i - 1], b[2 * i], t)
+end
+
+local w, h = obj.w, obj.h
+-- ベジエ曲線をpn分割した点
+local cx0, cy0, cx1, cy1
+-- 上の点における正規化された接線ベクトル
+local dx0, dy0, dx1, dy1
+-- 上の点における正規化された法線ベクトル
+local nx0, ny0, nx1, ny1
+--描画に用いる点をZ順
+local dpx0, dpy0, dpx1, dpy1, dpx2, dpy2, dpx3, dpy3
+
+-- drawpolyの元画像の座標
+local y0, y1
+
+local calcNextPoint = function(t)
+    cx1, cy1 = bez2d(px[1], py[1], px[2], py[2], px[3], py[3], t)
+    dx1, dy1 = normalizedTangentVector(px[1], py[1], px[2], py[2], px[3], py[3], t)
+    nx1, ny1 = -dy1, dx1
+
+    y1 = t*h
+
+    -- 接線
+    dpx2, dpx3 = cx1 + nx1 * w / 2, cx1 - nx1 * w / 2
+    dpy2, dpy3 = cy1 + ny1 * w / 2, cy1 - ny1 * w / 2
+end
+
+calcNextPoint(0)
+
+for i = 1, dn do
+    local t_ = i / dn
+
+    dpx0, dpx1 = dpx2, dpx3
+    dpy0, dpy1 = dpy2, dpy3
+    dx0, dy0 = dx1, dy1
+    y0 = y1
+
+    calcNextPoint(t_)
+
+    obj.drawpoly(
+        dpx0 - dx0, dpy0 - dy0, 0,
+        dpx1 - dx0, dpy1 - dy0, 0,
+        dpx3 + dx1, dpy3 + dy1, 0,
+        dpx2 + dx1, dpy2 + dy1, 0,
+        0, y0, w, y0, w, y1, 0, y1
+    )
+end
+
+obj.setoption("blend", 0)
+
+if obj.getoption("gui") then
+    obj.load("figure", "円", 0xffffff, 10 / zoom)
+    for i = 1, pn - 2 do
+        for j = 0, 50 do
+            local x, y = bez2d(px[i], py[i], px[i + 1], py[i + 1], px[i + 2], py[i + 2], j / 50)
+            obj.draw(x, y)
+        end
+    end
+end
+
+obj.copybuffer("obj", "tmp")
+obj.setoption("drawtarget", "framebuffer")

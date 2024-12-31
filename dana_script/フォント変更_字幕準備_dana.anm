@@ -1,0 +1,17 @@
+--track0:番号,0,16,0,1
+--track1:サイズ,0,1000,0,1
+--track2:装飾,0,3,0,1
+--dialog:フォント1,a="";フォント2,b="";フォント3,c="";フォント4,e="";フォント5,e="";フォント6,f="";フォント7,g="";フォント8,h="";フォント9,i="";フォント10,j="";フォント11,k="";フォント12,l="";フォント13,m="";フォント14,n="";フォント15,o="";フォント16,p="";
+
+-- rikky_module がなくても使えるようにする
+pcall(require, "rikky_module")
+if rikky_module then
+    rikky_module.font(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)
+end
+local fonts = { a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p }
+
+local font = obj.track0 ~= 0 and fonts[obj.track0] or ""
+local size = obj.track1 ~= 0 and obj.track1 or ""
+local deco = obj.track2 == 1 and "B" or obj.track2 == 2 and "I" or obj.track2 == 3 and "BI" or ""
+local text = require("PSDToolKit").subtitle.states[obj.layer].text
+require("PSDToolKit").subtitle.states[obj.layer].text = "<s" .. size .. "," .. font .. "," .. deco .. ">" .. text

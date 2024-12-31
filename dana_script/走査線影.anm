@@ -1,0 +1,47 @@
+--track0:角度,-360,360,0
+--track1:太さ,1,1000,15,1
+--track2:間隔,0,1000,15,1
+--track3:速さ,-1000,1000,100,1
+--dialog:色/col,local col=0xffffff;オフセット,local offset=0;アンカー,pos={50,50};
+
+obj.setanchor("pos", 1)
+
+obj.copybuffer("cache:body", "obj")
+local w, h = obj.getpixel()
+
+obj.setoption("drawtarget", "tempbuffer", w + math.abs(pos[1]), h + math.abs(pos[2]))
+obj.effect("単色化", "color", col, "輝度を保持する", 0)
+
+obj.draw(pos[1] / 2, pos[2] / 2)
+
+local ox, oy, oz, cx, cy, cz, rx, ry, rz = obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz
+if obj.track2 ~= 0 then
+    obj.load("figure", "四角形", 0, 1)
+    obj.setoption("blend", "alpha_sub")
+    local cos = math.cos(math.pi * obj.track0 / 180)
+    local sin = math.sin(math.pi * obj.track0 / 180)
+    local l = math.max(w + pos[1], h + pos[2]) * math.sqrt(2) / 2
+    local rot = function(x, y)
+        return cos * x - sin * y, sin * x + cos * y
+    end
+    offset = -(obj.track1 + obj.track2) + (offset + obj.track3*obj.time) % (obj.track1 + obj.track2)
+    for p=-l+offset, l, obj.track1 + obj.track2 do
+        local ya, yb = p, p + obj.track2
+        local x0, y0 = rot(-l, ya)
+        local x1, y1 = rot(l, ya)
+        local x2, y2 = rot(l, yb)
+        local x3, y3 = rot(-l, yb)
+        obj.drawpoly(x0, y0, 0, x1, y1, 0, x2, y2, 0, x3, y3, 0)
+    end
+    obj.setoption("blend", 0)
+end
+
+obj.copybuffer("obj", "cache:body")
+
+obj.ox, obj.oy, obj.oz, obj.cx, obj.cy, obj.cz, obj.rx, obj.ry, obj.rz = ox, oy, oz, cx, cy, cz, rx, ry, rz
+obj.ox = obj.ox + pos[1] / 2
+obj.oy = obj.oy + pos[2] / 2
+
+obj.draw(-pos[1] / 2, -pos[2] / 2)
+
+obj.copybuffer("obj", "tmp")

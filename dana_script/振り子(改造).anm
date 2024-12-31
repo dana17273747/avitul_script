@@ -1,0 +1,10 @@
+--track0:‘¬‚³,0,10,2
+--track1:Šp“x,0,180,30
+--track2:‚¸‚ç‚µ,0,100,0
+--dialog:‰ñ”w’è,local m=0;
+
+local n = (obj.totaltime*obj.track0+obj.index*obj.track2/50) --Œ³‚ÌŠp“x‚É–ß‚é‰ñ”(”ñ®”)
+local m = m == 0 and math.floor(n) or m
+local v = obj.track0*m/n
+
+obj.rz = obj.rz+math.sin((obj.time*v+obj.index*obj.track2/50)*math.pi)*obj.track1

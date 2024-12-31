@@ -1,0 +1,26 @@
+
+--track0:サイズ,0,500,3,1
+--track1:ぼかし,0,100,10,1
+--track2:繰り返し,0,100,1,1
+--dialog:縁色/col,local col=0x000000;サイズ固定/chk,local si=0;
+
+obj.effect("単色化", "color", 0xffffff)
+
+for i = 1, obj.track2 do
+    obj.copybuffer("cache:body","obj")
+    if si ~= 1 then
+        obj.effect("縁取り","サイズ",obj.track0,"ぼかし",obj.track1,"color",col)
+    end
+    local w,h = obj.getpixel()
+    obj.setoption("drawtarget","tempbuffer",w,h)
+    if si == 1 then
+        obj.effect("縁取り","サイズ",obj.track0,"ぼかし",obj.track1,"color",col)
+    end
+    obj.draw()
+    obj.copybuffer("obj","cache:body")
+    obj.setoption("blend","alpha_sub")
+    obj.draw()
+    obj.copybuffer("obj","tmp")
+    obj.setoption("drawtarget","framebuffer")
+    obj.setoption("blend",0)
+end

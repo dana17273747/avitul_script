@@ -1,0 +1,469 @@
+@中間色
+--track0:オフセット%,0,100,50
+--track1:オフセット%,0,100,0
+--track2:オフセット%,0,100,0
+--track3:オフセット%,0,100,0
+--dialog:色1/col,a=0xff0000;強さ1,b=100;色2/col,c=0xffffff;強さ2,d=100;色3/col,e=0xffffff;強さ3,f=100;色4/col,g=0xffffff;強さ4,h=100;
+if dana_b2d_gradient_stops == nil then
+    dana_b2d_gradient_stops = {}
+end
+if dana_b2d_gradient_stops[obj.layer] == nil or dana_b2d_gradient_stops[obj.layer].frame ~= obj.frame then
+    dana_b2d_gradient_stops[obj.layer] = { frame = obj.frame }
+end
+
+local stops = dana_b2d_gradient_stops[obj.layer]
+local colors = { { a, b }, { c, d }, { e, f }, { g, h } }
+local insert = table.insert
+
+for i = 1, 3 do
+    local offset = obj["track" .. (i - 1)]
+    if 0 <offset and offset < 100 then
+        insert(stops, { offset / 100, colors[i] })
+    end
+end
+
+@線形
+--track0:強さ,0,100,100
+--track1:角度,-3600,3600,0
+--track2:幅,0,2000,100,1
+--dialog:始点/col,a=0xffffff;始点強さ,b=100;終点/col,c=0x000000;終点強さ,d=100;ブレンド[0-28],e=4;拡張モード[1~3],f=1;点,p={0,0};
+--check0:強さ個別設定,0
+
+local sin,cos,pi = math.sin, math.cos, math.pi
+local min, max = math.min, math.max
+local alpha = function(v)
+    return 0x1000000 * math.floor(0xff * min(100, max(0, v))/100)
+end
+local rgba = function(rgb, a)
+    return alpha(a) + rgb
+end
+local comp = function(a, b) return a[1] < b[1] end
+
+local stops
+if dana_b2d_gradient_stops ~= nil and dana_b2d_gradient_stops[obj.layer] ~= nil and dana_b2d_gradient_stops[obj.layer].frame == obj.frame then
+    stops = dana_b2d_gradient_stops[obj.layer]
+    table.sort(stops, comp)
+    dana_b2d_gradient_stops[obj.layer] = nil
+else
+    stops = {}
+end
+
+local extendmodes = { 0, 1, 2 }
+
+local strength = obj.track0
+local rad = obj.track1/180 * pi
+local graW = obj.track2/2
+obj.setanchor("p", 1)
+local compop = e or 0
+
+-- 一瞬でも無効な値になるとクラッシュしてしまう
+local extendmode = extendmodes[f]
+extendmode = extendmode ~= nil and extendmode or 1
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+
+local width,height = obj.getpixel()
+
+local bl, data = BLAviUtl(obj)
+
+bl:compop(compop)
+
+local gra = BLAviUtl.gradient(
+    C.BL_GRADIENT_TYPE_LINEAR, {
+        p[1] + width / 2 +  graW * cos(rad),
+        p[2] + height / 2 + graW * sin(rad),
+        p[1] + width / 2 + graW * cos(rad + pi),
+        p[2] + height / 2 + graW * sin(rad + pi)
+    },
+    extendmode
+)
+
+if obj.check0 then
+    gra:addStop(0, rgba(a, b))
+    for i, stop in ipairs(stops) do
+        gra:addStop(stop[1], rgba(stop[2][1], stop[2][2]))
+    end
+    gra:addStop(1, rgba(c, d))
+else
+    gra:addStop(0, rgba(a, strength))
+    for i, stop in ipairs(stops) do
+        gra:addStop(stop[1], rgba(stop[2][1], strength))
+    end
+    gra:addStop(1, rgba(c, strength))
+end
+
+bl:setGradient(gra)
+
+bl:fillAll()
+
+obj.putpixeldata(data)
+
+@放射
+--track0:強さ,0,100,100
+--track1:幅1,0,1000,100,1
+--track2:幅2,0,1000,0,1
+--dialog:始点/col,a=0xffffff;始点強さ,b=100;終点/col,c=0x000000;終点強さ,d=100;ブレンド[0-28],e=4;拡張モード[1-3],f=1;点,p={0,0,0,0};
+--check0:強さ個別設定,0
+
+local min, max = math.min, math.max
+local alpha = function(v)
+    return 0x1000000 * math.floor(0xff * min(100, max(0, v))/100)
+end
+local rgba = function(rgb, a)
+    return alpha(a) + rgb
+end
+local comp = function(a, b) return a[1] < b[1] end
+
+local stops
+if dana_b2d_gradient_stops ~= nil and dana_b2d_gradient_stops[obj.layer] ~= nil and dana_b2d_gradient_stops[obj.layer].frame == obj.frame then
+    stops = dana_b2d_gradient_stops[obj.layer]
+    table.sort(stops, comp)
+    dana_b2d_gradient_stops[obj.layer] = nil
+else
+    stops = {}
+end
+
+local extendmodes = { 0, 1, 2 }
+
+local strength = obj.track0
+local graW1 = obj.track1
+local graW2 = obj.track2
+obj.setanchor("p", 2)
+local compop = e or 0
+-- 一瞬でも無効な値になるとクラッシュしてしまう
+local extendmode = extendmodes[f]
+extendmode = extendmode ~= nil and extendmode or 1
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+
+local width,height = obj.getpixel()
+
+local bl, data = BLAviUtl(obj)
+
+bl:compop(compop)
+
+local gra = BLAviUtl.gradient(
+    C.BL_GRADIENT_TYPE_RADIAL, {
+        p[1] + width / 2,
+        p[2] + height / 2,
+        p[3] + width / 2,
+        p[4] + height / 2,
+        graW1, graW2
+    },
+    extendmode
+)
+
+if obj.check0 then
+    gra:addStop(0, rgba(a, b))
+    for i, stop in ipairs(stops) do
+        gra:addStop(stop[1], rgba(stop[2][1], stop[2][2]))
+    end
+    gra:addStop(1, rgba(c, d))
+else
+    gra:addStop(0, rgba(a, strength))
+    for i, stop in ipairs(stops) do
+        gra:addStop(stop[1], rgba(stop[2][1], strength))
+    end
+    gra:addStop(1, rgba(c, strength))
+end
+
+bl:setGradient(gra)
+
+bl:fillAll()
+
+obj.putpixeldata(data)
+
+
+@円錐
+--track0:強さ,0,100,100
+--track1:角度,-3600,3600,0
+--track2:繰り返し,0,100,1
+--dialog:始点/col,a=0xffffff;始点強さ,b=100;終点/col,c=0x000000;終点強さ,d=100;ブレンド[0-28],e=5;点,p={0,0};
+--check0:強さ個別設定,0
+local pi = math.pi
+local min, max = math.min, math.max
+local alpha = function(v)
+    return 0x1000000 * math.floor(0xff * min(100, max(0, v))/100)
+end
+local rgba = function(rgb, a)
+    return alpha(a) + rgb
+end
+local comp = function(a, b) return a[1] < b[1] end
+
+local stops
+if dana_b2d_gradient_stops ~= nil and dana_b2d_gradient_stops[obj.layer] ~= nil and dana_b2d_gradient_stops[obj.layer].frame == obj.frame then
+    stops = dana_b2d_gradient_stops[obj.layer]
+    table.sort(stops, comp)
+    dana_b2d_gradient_stops[obj.layer] = nil
+else
+    stops = {}
+end
+
+local strength = obj.track0
+local angle = obj.track1/180 * pi
+local rep = obj.track2
+obj.setanchor("p", 1)
+local compop = e or 0
+local extendmode = 0
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+
+local width,height = obj.getpixel()
+
+local bl, data = BLAviUtl(obj)
+
+bl:compop(compop)
+
+local gra = BLAviUtl.gradient(
+    C.BL_GRADIENT_TYPE_CONIC, {
+        p[1] + width / 2,
+        p[2] + height / 2,
+        angle, rep
+    },
+    extendmode
+)
+
+if obj.check0 then
+    gra:addStop(0, rgba(a, b))
+    for i, stop in ipairs(stops) do
+        gra:addStop(stop[1], rgba(stop[2][1], stop[2][2]))
+    end
+    gra:addStop(1, rgba(c, d))
+else
+    gra:addStop(0, rgba(a, strength))
+    for i, stop in ipairs(stops) do
+        gra:addStop(stop[1], rgba(stop[2][1], strength))
+    end
+    gra:addStop(1, rgba(c, strength))
+end
+
+bl:setGradient(gra)
+
+bl:fillAll()
+
+obj.putpixeldata(data)
+
+@中間透明度
+--track0:オフセット%,0,100,50
+--track1:透明度,0,100,50
+--track2:オフセット%,0,100,0
+--track3:透明度,0,100,0
+if dana_b2d_opacity_gradient_stops == nil then
+    dana_b2d_opacity_gradient_stops = {}
+end
+if dana_b2d_opacity_gradient_stops[obj.layer] == nil or dana_b2d_opacity_gradient_stops[obj.layer].frame ~= obj.frame then
+    dana_b2d_opacity_gradient_stops[obj.layer] = { frame = obj.frame }
+end
+
+local stops = dana_b2d_opacity_gradient_stops[obj.layer]
+
+local insert = table.insert
+
+for i = 0, 2, 2 do
+    local offset = obj["track" .. i]
+    if 0 <offset and offset < 100 then
+        insert(stops, { offset / 100, obj["track" .. (i + 1)] })
+    end
+end
+
+@線形_透明度
+--track0:開始透明度,0,100,0
+--track1:終了透明度,0,100,100
+--track2:角度,-3600,3600,0
+--track3:幅,0,2000,100,1
+--dialog:拡張モード[1~3],f=1;点,p={0,0};
+
+local sin,cos,pi = math.sin, math.cos, math.pi
+local opacity = function(a)
+    return 0x1000000 * math.floor(0xff * (1 - a / 100))
+end
+local comp = function(a, b) return a[1] < b[1] end
+
+local stops
+if dana_b2d_opacity_gradient_stops ~= nil and dana_b2d_opacity_gradient_stops[obj.layer] ~= nil and dana_b2d_opacity_gradient_stops[obj.layer].frame == obj.frame then
+    stops = dana_b2d_opacity_gradient_stops[obj.layer]
+    table.sort(stops, comp)
+    dana_b2d_opacity_gradient_stops[obj.layer] = nil
+else
+    stops = {}
+end
+
+local extendmodes = { 0, 1, 2 }
+
+local opacityStart = opacity(obj.track0)
+local opacityEnd = opacity(obj.track1)
+local rad = obj.track2/180 * pi
+local graW = obj.track3/2
+obj.setanchor("p", 1)
+local compop = 7
+
+-- 一瞬でも無効な値になるとクラッシュしてしまう
+local extendmode = extendmodes[f]
+extendmode = extendmode ~= nil and extendmode or 1
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+
+local width,height = obj.getpixel()
+
+local bl, data = BLAviUtl(obj)
+
+bl:compop(compop)
+
+local gra = BLAviUtl.gradient(
+    C.BL_GRADIENT_TYPE_LINEAR, {
+        p[1] + width / 2 +  graW * cos(rad),
+        p[2] + height / 2 + graW * sin(rad),
+        p[1] + width / 2 + graW * cos(rad + pi),
+        p[2] + height / 2 + graW * sin(rad + pi)
+    },
+    extendmode
+)
+
+gra:addStop(0, opacityStart)
+for i, stop in ipairs(stops) do
+    gra:addStop(stop[1], opacity(stop[2]))
+end
+gra:addStop(1, opacityEnd)
+
+
+bl:setGradient(gra)
+
+bl:fillAll()
+
+obj.putpixeldata(data)
+
+@放射_透明度
+--track0:開始透明度,0,100,0
+--track1:終了透明度,0,100,100
+--track2:幅1,0,1000,100,1
+--track3:幅2,0,1000,0,1
+--dialog:拡張モード[1-3],f=1;点,p={0,0,0,0};
+
+local opacity = function(a)
+    return 0x1000000 * math.floor(0xff * (1 - a / 100))
+end
+local comp = function(a, b) return a[1] < b[1] end
+
+local stops
+if dana_b2d_opacity_gradient_stops ~= nil and dana_b2d_opacity_gradient_stops[obj.layer] ~= nil and dana_b2d_opacity_gradient_stops[obj.layer].frame == obj.frame then
+    stops = dana_b2d_opacity_gradient_stops[obj.layer]
+    table.sort(stops, comp)
+    dana_b2d_opacity_gradient_stops[obj.layer] = nil
+else
+    stops = {}
+end
+
+local extendmodes = { 0, 1, 2 }
+
+local opacityStart = opacity(obj.track0)
+local opacityEnd = opacity(obj.track1)
+local graW1 = obj.track2
+local graW2 = obj.track3
+obj.setanchor("p", 2)
+local compop = 7
+
+-- 一瞬でも無効な値になるとクラッシュしてしまう
+local extendmode = extendmodes[f]
+extendmode = extendmode ~= nil and extendmode or 1
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+
+local width,height = obj.getpixel()
+
+local bl, data = BLAviUtl(obj)
+
+bl:compop(compop)
+
+local gra = BLAviUtl.gradient(
+    C.BL_GRADIENT_TYPE_RADIAL, {
+        p[1] + width / 2,
+        p[2] + height / 2,
+        p[3] + width / 2,
+        p[4] + height / 2,
+        graW1, graW2
+    },
+    extendmode
+)
+
+gra:addStop(0, opacityStart)
+for i, stop in ipairs(stops) do
+    gra:addStop(stop[1], opacity(stop[2]))
+end
+gra:addStop(1, opacityEnd)
+
+bl:setGradient(gra)
+
+bl:fillAll()
+
+obj.putpixeldata(data)
+
+
+@円錐_透明度
+--track0:開始透明度,0,100,0
+--track1:終了透明度,0,100,100
+--track2:角度,-3600,3600,0
+--track3:繰り返し,0,100,1
+--dialog:点,p={0,0};
+local pi = math.pi
+local opacity = function(a)
+    return 0x1000000 * math.floor(0xff * (1 - a / 100))
+end
+local comp = function(a, b) return a[1] < b[1] end
+
+local stops
+if dana_b2d_opacity_gradient_stops ~= nil and dana_b2d_opacity_gradient_stops[obj.layer] ~= nil and dana_b2d_opacity_gradient_stops[obj.layer].frame == obj.frame then
+    stops = dana_b2d_opacity_gradient_stops[obj.layer]
+    table.sort(stops, comp)
+    dana_b2d_opacity_gradient_stops[obj.layer] = nil
+else
+    stops = {}
+end
+
+local opacityStart = opacity(obj.track0)
+local opacityEnd = opacity(obj.track1)
+local angle = obj.track2/180 * pi
+local rep = obj.track3
+obj.setanchor("p", 1)
+local compop = 7
+local extendmode = 0
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+
+local width,height = obj.getpixel()
+
+local bl, data = BLAviUtl(obj)
+
+bl:compop(compop)
+
+local gra = BLAviUtl.gradient(
+    C.BL_GRADIENT_TYPE_CONIC, {
+        p[1] + width / 2,
+        p[2] + height / 2,
+        angle, rep
+    },
+    extendmode
+)
+
+gra:addStop(0, opacityStart)
+for i, stop in ipairs(stops) do
+    gra:addStop(stop[1], opacity(stop[2]))
+end
+gra:addStop(1, opacityEnd)
+
+bl:setGradient(gra)
+
+bl:fillAll()
+
+obj.putpixeldata(data)

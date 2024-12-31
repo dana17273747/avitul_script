@@ -1,0 +1,24 @@
+--track0:範囲始点,-720,720,0
+--track1:範囲角度,-720,720,360
+--track2:数,0,1000,10,1
+--track3:中心幅,0,1000,100
+--dialog:個別オブジェクト/chk,local kobetu=0;角度固定/chk,local fix=0;角度ばらつき,local rrad=0;ばらつきシード,local seed=0;
+
+local rrad = rrad or 0
+local seed = seed or 0
+local haba = fix == 1 and obj.track3 or obj.track3 + obj.h/2
+if kobetu == 0 then
+    for i = 0 , obj.track2-1 do
+        local rad = obj.track0/180*math.pi + i*obj.track1/180*math.pi/obj.track2 + rrad*math.pi*obj.rand(-1,1,seed+i,0)/200
+        local x = haba * math.cos(rad)
+        local y = haba * math.sin(rad)
+        local deg = rad * 180 / math.pi
+        obj.draw(x,y,0,1,1,0,0,fix == 1 and 0 or deg - 90)
+    end
+else
+    local rad = obj.track0/180*math.pi + obj.index*obj.track1/180*math.pi/obj.num + rrad*math.pi*obj.rand(-1,1,seed+obj.index,0)/200
+    local x = haba * math.cos(rad)
+    local y = haba * math.sin(rad)
+    local deg = rad * 180 / math.pi
+    obj.draw(x-obj.ox,y-obj.oy,0,1,1,0,0,fix == 1 and 0 or deg + 90)
+end

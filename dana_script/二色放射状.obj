@@ -1,0 +1,28 @@
+
+--track0:幅,0,2000,1920
+--track1:高さ,0,2000,1080
+--track2:初期値,-3600,3600,0
+--track3:回転速度,-1080,1080,0
+--dialog:本数,local n=10;中心,cen={0,0};色1/col,local col1=0xff0000;色2/col,local col2=0xffff00;色1透明化/chk,local al=0;
+
+local w,h=SHIFT(obj.track0,-1),SHIFT(obj.track1,-1)
+obj.setoption("drawtarget","tempbuffer",obj.track0,obj.track1)
+obj.setanchor("cen",1)
+
+if al == 0 then
+    obj.load("figure","四角形",col1,1)
+    obj.drawpoly(-w,-h,0,w,-h,0,w,h,0,-w,h,0)
+end
+local r = ((w+math.abs(cen[1]))^2+(h+math.abs(cen[2]))^2)^0.5
+r = SHIFT(r,1)
+local rad = math.pi/n
+
+obj.load("figure","四角形",col2,1)
+for i=1,n do
+    local rad1 = 2*i*rad+(obj.track2+obj.time*obj.track3)*math.pi/180
+    local rad2 = rad1 + rad
+    obj.drawpoly(cen[1],cen[2],0,cen[1],cen[2],0,cen[1]+r*math.cos(rad1),cen[2]+r*math.sin(rad1),0,cen[1]+r*math.cos(rad2),cen[2]+r*math.sin(rad2),0)
+end
+
+obj.load("tempbuffer")
+obj.setoption("drawtarget","framebuffer")

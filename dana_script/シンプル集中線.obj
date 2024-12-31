@@ -1,0 +1,56 @@
+--track0:中心幅,0,1000,100
+--track1:数,0,1000,50,1
+--track2:太さ(°),0,180,1.5
+--track3:形状,-1000,1000,1,1
+--dialog:色/col,local c=0xffffff;形状変化周期,local a=0;サイズ幅,local w=1920;サイズ高さ,local h=1080;角度ばらつき,local rrad=5;太さばらつき(°),local rthickness=1;中心幅ばらつき(%),local rcwidth=10;仮想バッファ/chk,local tmpb=1;
+
+local floor, sqrt, cos, sin, pi = math.floor, math.sqrt, math.cos, math.sin, math.pi
+
+obj.load("figure", "四角形", c, 1)
+
+local width = w or 1920
+local hight = h or 1080
+if tmpb == 1 then
+    obj.setoption("drawtarget", "tempbuffer", width, hight)
+end
+local l = sqrt(width ^ 2 + hight ^ 2)
+local rrad = rrad or 0
+local rthickness = rthickness or 0
+rthickness = rthickness / 2
+local rcwidth = rcwidth or 0
+
+local createRand = function()
+    local randi = 0
+    local f = 0
+    if a ~= 0 then
+        f = floor(obj.frame / a)
+    end
+    local r = obj.rand
+    return function(min, max)
+        randi = randi + 1
+        return r(min, max, 1000 * f + obj.track3, randi)
+    end
+end
+
+local rand = createRand()
+
+for i = 0, obj.track1 - 1 do
+    local rad0 = i * 2 * pi / obj.track1 + rrad * pi * rand(-1, 1) / 200
+    local haba = obj.track0 * (100 - rcwidth * rand(-1000, 1000) / 1000) / 100
+    local x0 = haba * cos(rad0)
+    local y0 = haba * sin(rad0)
+    local rad1 = obj.track2 / 360 * pi
+    local rt = pi * rthickness * rand(-1000, 1000) / 1000 / 180
+    rad1 = rad1 + rt
+    local x1 = x0 + l * cos(rad0 - rad1)
+    local y1 = y0 + l * sin(rad0 - rad1)
+    local x2 = x0 + l * cos(rad0 + rad1)
+    local y2 = y0 + l * sin(rad0 + rad1)
+
+    obj.drawpoly(x0, y0, 0, x0, y0, 0,
+        x1, y1, 0, x2, y2, 0,
+        0, 0, 1, 0, 1, 1, 0, 1, obj.alpha)
+end
+if tmpb == 1 then
+    obj.copybuffer("obj", "tmp")
+end

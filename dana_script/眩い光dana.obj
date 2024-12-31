@@ -1,0 +1,39 @@
+--track0:数,0,2000,360,1
+--track1:長さ,0,2000,500
+--track2:太さ,1,100,5
+--track3:透明度,0,100,20
+--dialog:周期,local cycle=2;色/col,local color=0xffffff;減衰,local d=2;合成モード(1-9),local blend=1;色ランダム/chk,local crand=0;
+
+local blendmode = {0,1,4,6,8,9,"alpha_add","alpha_max","alpha_add2"}
+local blend = blend or 1
+local cycle = cycle or 4
+cycle = cycle * obj.framerate
+
+obj.setoption("drawtarget","tempbuffer",2*obj.track1,2*obj.track1)
+obj.setoption("blend",blendmode[blend])
+obj.load("figure","四角形",color,1)
+
+for i = 0 , obj.track0 - 1 do
+    local offset = obj.rand(0,cycle-1,i,0)
+    local n,r = math.modf((obj.frame+offset)/cycle)
+    local l = obj.rand(0,obj.track1,i,n)
+    local rad = (i+obj.rand(-500,500,i,n)/1000)*2*math.pi/obj.track0
+    local cos = math.cos(rad)
+    local sin = math.sin(rad)
+    local x0 = l * cos * r
+    local y0 = l * sin * r
+    local x1 = obj.track2 * sin
+    local y1 = -obj.track2 * cos
+    local x2 = -obj.track2 * sin
+    local y2 = obj.track2 * cos
+
+    if crand==1 then
+        obj.load("figure","四角形",obj.rand(0,0xffffff,i,n),1)
+    end
+
+    obj.drawpoly(x0,y0,0,x0,y0,0,
+                 x1,y1,0,x2,y2,0,
+                 0,0,1,0,1,1,0,1,(100-obj.track3)/100*(1-r)^d)
+end
+
+obj.copybuffer("obj","tmp")

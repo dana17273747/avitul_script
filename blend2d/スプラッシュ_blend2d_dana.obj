@@ -1,0 +1,58 @@
+--track0:進行,0,100,100
+--track1:形状,-1000,1000,0,1
+--track2:角度ランダム,0,100,30
+--track3:長さランダム,0,100,100
+--dialog:数,local n=11;中心サイズ,local a=100;最大長さ,local b=100;色/col,c=0xffffff;
+
+local rcount = 0
+local rand = function(seed)
+    rcount = rcount+1
+    return obj.rand(0,10000,seed,rcount)/10000
+end
+local sin,cos,pi = math.sin,math.cos,math.pi
+local t = obj.track0/100
+local r = a
+local l = b
+local num = n or 11
+local s = obj.track1
+local rr = obj.track2/100
+local lr = obj.track3/100
+local rad1 = 2*pi/num
+local rad2 = rad1/4
+local p = {}
+
+local w,h = 2*(r+2*l),2*(r+2*l)
+obj.setoption("drawtarget", "tempbuffer", w,h)
+obj.copybuffer("obj", "tmp")
+
+for i = 0, num-1 do
+    local rad = rad1 * (i + rr*(rand(s)-0.5))
+    local l_ = l * (1 + lr*(rand(s)-0.5))
+    local r2 = l_/4
+    p[10*i+1 ] = r*cos(rad - (1-t)*rad1/3) + w/2
+    p[10*i+2 ] = r*sin(rad - (1-t)*rad1/3) + h/2
+    p[10*i+3 ] = (r+t*l_)*cos(rad-rad2) + w/2
+    p[10*i+4 ] = (r+t*l_)*sin(rad-rad2) + h/2
+    p[10*i+5 ] = (r+t*(l_+r2))*cos(rad) + w/2
+    p[10*i+6 ] = (r+t*(l_+r2))*sin(rad) + h/2
+    p[10*i+7 ] = (r+t*l_)*cos(rad+rad2) + w/2
+    p[10*i+8 ] = (r+t*l_)*sin(rad+rad2) + h/2
+    p[10*i+9 ] = r*cos(rad + (1-t)*rad1/3) + w/2
+    p[10*i+10] = r*sin(rad + (1-t)*rad1/3) + h/2
+end
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+local bez = require("bez")
+
+local curve = bez(p, true, 0.5)
+
+local bl, data = BLAviUtl(obj)
+
+bl:color(0xff000000 + c)
+bl:curve(curve, 50*num)
+
+bl:fill(C.BL_FILL_RULE_NON_ZERO)
+
+obj.putpixeldata(data)

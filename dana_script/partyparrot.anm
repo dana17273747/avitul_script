@@ -1,0 +1,77 @@
+--track0:âÒì],-1080,1080,0
+--track1:îÕàÕïù,0,1000,100
+--track2:îÕàÕçÇÇ≥,0,1000,100
+
+--dialog:íÜêS,posc={0,0};âÒì]îÕàÕíÜêS,pos0={0,-100};
+
+local r = math.sqrt((posc[1]-pos0[1]^2)+(posc[2]-pos0[2])^2)
+
+obj.setanchor("posc",1)
+obj.setanchor("pos0",1)
+
+local posf = {}
+posf.x = {}
+posf.y = {}
+posf.x[1] = pos0[1]-obj.track1/2
+posf.x[2] = pos0[1]+obj.track1/2
+posf.y[1] = pos0[2]-obj.track2/2
+posf.y[2] = pos0[2]+obj.track2/2
+
+local pos0_ = {}
+local rad = math.rad(obj.track0)
+local cos,sin = math.cos(rad), math.sin(rad)
+pos0_[1] = pos0[1]-posc[1]
+pos0_[2] = pos0[2]-posc[2]
+pos0_[1],pos0_[2] = cos*pos0_[1]+sin*pos0_[2]+posc[1], -sin*pos0_[1]+cos*pos0_[2]+posc[2]
+local posd = {}
+posd.x = {}
+posd.y = {}
+posd.x[1] = pos0_[1]-obj.track1/2
+posd.x[2] = pos0_[1]+obj.track1/2
+posd.y[1] = pos0_[2]-obj.track2/2
+posd.y[2] = pos0_[2]+obj.track2/2
+
+local w, h = obj.getpixel()
+obj.setoption("drawtarget","tempbuffer",w,h)
+local gap = 1
+
+obj.drawpoly(
+    -w/2-gap,-h/2+gap,0,w/2+gap,-h/2+gap,0,
+    posd.x[2]+gap,posd.y[1]+gap,0,posd.x[1]-gap,posd.y[1]+gap,0,
+    0,0,w,0,posf.x[2]+w/2,posf.y[1]+h/2,posf.x[1]+w/2,posf.y[1]+h/2
+)
+obj.drawpoly(
+    w/2-gap,-h/2-gap,0,w/2-gap,h/2+gap,0,
+    posd.x[2]-gap,posd.y[2]+gap,0,posd.x[2]-gap,posd.y[1]-gap,0,
+    w,0,w,h,posf.x[2]+w/2,posf.y[2]+h/2,posf.x[2]+w/2,posf.y[1]+h/2
+)
+obj.drawpoly(
+    w/2+gap,h/2-gap,0,-w/2-gap,h/2-gap,0,
+    posd.x[1]-gap,posd.y[2]-gap,0,posd.x[2]+gap,posd.y[2]-gap,0,
+    w,h,0,h,posf.x[1]+w/2,posf.y[2]+h/2,posf.x[2]+w/2,posf.y[2]+h/2
+)
+obj.drawpoly(
+    -w/2+gap,h/2+gap,0,-w/2+gap,-h/2-gap,0,
+    posd.x[1]+gap,posd.y[1]-gap,0,posd.x[1]+gap,posd.y[2]+gap,0,
+    0,h,0,0,posf.x[1]+w/2,posf.y[1]+h/2,posf.x[1]+w/2,posf.y[2]+h/2
+)
+
+local alpha =1
+if obj.getoption("gui") then
+    alpha = 0.8
+end
+obj.drawpoly(
+    posd.x[1]-gap,posd.y[1]-gap,0,posd.x[2]+gap,posd.y[1]-gap,0,
+    posd.x[2]+gap,posd.y[2]+gap,0,posd.x[1]-gap,posd.y[2]+gap,0,
+    posf.x[1]+w/2,posf.y[1]+h/2,posf.x[2]+w/2,posf.y[1]+h/2,posf.x[2]+w/2,posf.y[2]+h/2,posf.x[1]+w/2,posf.y[2]+h/2,alpha
+)
+
+if obj.getoption("gui") then
+    obj.load("figure","â~",0x000000,20)
+    obj.draw(posc[1],posc[2])
+    obj.load("figure","â~",0xffff00,20)
+    obj.draw(pos0[1],pos0[2])
+end
+
+obj.load("tempbuffer")
+obj.setoption("drawtarget","framebuffer")

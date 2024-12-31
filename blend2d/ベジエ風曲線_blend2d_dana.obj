@@ -1,0 +1,38 @@
+--track0:点の数,3,16,3,1
+--track1:結合位置,0,100,50
+--track2:分割数,1,1000,100,1
+--track3:描画モード,-2,1000,-2,1
+--check0:ループ,1
+--dialog:色/col,local c=0xffffff;アンカー,pos={0,0};
+
+obj.setanchor("pos", obj.track0, obj.check0 and "loop" or "line")
+
+local w, h = 1920,1080
+obj.setoption("drawtarget", "tempbuffer", w, h)
+obj.copybuffer("obj", "tmp")
+
+obj.setoption("focus_mode", "fixed_size")
+
+for i = 1, #pos-1, 2 do
+    pos[i] = pos[i] + w/2
+    pos[i+1] = pos[i+1] + h/2
+end
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+local bez = require("bez")
+
+local curve = bez(pos, obj.check0, obj.track1/100)
+
+local bl, data = BLAviUtl(obj)
+bl:color(0xff000000 + c)
+bl:curve(curve, obj.track2*(obj.check0 and obj.track0 or (obj.track0-2)))
+
+if obj.track3 < 0 then
+    bl:fill(obj.track3 == -2 and C.BL_FILL_RULE_NON_ZERO or C.BL_FILL_RULE_EVEN_ODD)
+else
+    bl:stroke(obj.track3)
+end
+
+obj.putpixeldata(data)

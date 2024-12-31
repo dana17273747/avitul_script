@@ -1,0 +1,5 @@
+--track0:ç∂âE,-1,1,0,1
+--track1:è„â∫,-1,1,0,1
+
+obj.ox = obj.track0 * ( obj.screen_w - obj.w ) / 2
+obj.oy = obj.track1 * ( obj.screen_h - obj.h ) / 2

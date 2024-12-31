@@ -1,0 +1,23 @@
+--track0:Šî€X,-2000,2000,0
+--track1:Šî€Y,-2000,2000,0
+--track2:Šî€Z,-2000,2000,0
+--track3:‘ÎÌƒŒƒCƒ„[,1,100,1,1
+--dialog:‘ÎÌ‘Š‘ÎˆÊ’u,local lay=-1;X,local ax=1;Y,local ay=1;Z,local az=1;
+
+local x,y,z = 0,0,0
+if ax ~= 0 then
+    x = obj.getvalue("layer"..obj.track3..".x") or 0
+    x = x-obj.track0
+end
+if ay ~= 0 then
+    y = obj.getvalue("layer"..obj.track3..".y") or 0
+    y = y-obj.track1
+end
+if az ~= 0 then
+    z = obj.getvalue("layer"..obj.track3..".z") or 0
+    z = z - obj.track2
+end
+
+obj.ox = obj.ox + ax*x
+obj.oy = obj.oy + ay*y
+obj.oz = obj.oz + az*z

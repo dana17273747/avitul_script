@@ -1,0 +1,101 @@
+@ÉåÉCÉÑÅ[ÉtÉFÅ[ÉhÉCÉìÉAÉEÉg
+--track0:éûä‘,0,10,0.5
+
+local function morphing(alpha)
+	local w,h = obj.getpixel()
+	obj.setoption("drawtarget","tempbuffer",w,h)
+	obj.setoption("blend","alpha_add")
+	obj.draw(0,0,0,1,alpha)
+	obj.copybuffer("obj","cache:PSD_morphing"..obj.layer)
+	obj.draw(0,0,0,1,1-alpha)
+	obj.copybuffer("obj","tmp")
+end
+
+if PSD_morphing_dana == nil then
+	PSD_morphing_dana = {}
+end
+
+if subobj.notfound then
+	if PSD_morphing_dana[obj.layer] then
+		local a = ( obj.time - PSD_morphing_dana[obj.layer] ) / obj.track0
+		if 0 < a and a < 1 then
+			morphing(a)
+			return
+		end
+	end
+	obj.copybuffer("cache:PSD_morphing"..obj.layer,"obj")
+else
+	if subobj.time < obj.track0 then
+		local a = subobj.time/obj.track0
+		morphing(a)
+	else
+	PSD_morphing_dana[obj.layer] = obj.time - subobj.time + subobj.totaltime
+	obj.copybuffer("cache:PSD_morphing"..obj.layer,"obj")
+	end
+end
+
+@ìÆâÊçƒê∂
+--track0:X,-2000,2000,0,0.01
+--track1:Y,-2000,2000,0,0.01
+--track2:ägëÂó¶,0,800,100,0.1
+--track3:çƒê∂ë¨ìx,-800,800,100
+--check0:ç∂âEîΩì],0
+--file:
+
+if subobj.notfound then
+	return
+end
+obj.draw()
+
+local t = subobj.time * obj.track3/100
+local totaltime = obj.load("movie", file, t, 1)
+
+if t > totaltime then
+	return
+end
+
+if obj.check0 then
+		obj.effect("îΩì]","ç∂âEîΩì]",1)
+end
+
+local zoom = obj.getvalue("zoom")/100
+
+obj.draw(zoom * (obj.track0 - obj.x), zoom * (obj.track1 - obj.y), -zoom * obj.z, obj.track2/100)
+
+@Ç‡ÇøÇ¡
+--track0:ägëÂó¶1,-100,100,15
+--track1:ägëÂó¶2,-100,100,-15
+--track2:ägëÂó¶3,-100,100,-10
+--track3:åJÇËï‘Çµ,-1,100,1,1
+--dialog:í∑Ç≥1,local a=0.3;í∑Ç≥2,local b=0.4;í∑Ç≥3,local c=0.4;åJÇËï‘Çµä‘äu,local d=0;ë´å≥,pos={0,0};
+
+obj.setanchor("pos", 1)
+local foot = pos[2]
+
+if subobj.notfound then
+    return
+end
+
+local t = math.max(0, subobj.time)
+local n = math.ceil(t/(a+b+c+d))
+if obj.track3 >= 0 and n > obj.track3 then
+    return
+end
+t = t % (a+b+c+d)
+
+obj.cy = obj.cy+foot
+obj.oy = obj.oy+foot
+
+if t < a then
+    t = t/a
+    obj.effect("ägëÂó¶", "X", 100+obj.track0*t, "Y", 100+obj.track1*t)
+elseif t < (a+b) then
+    t = 1-(t-a)/b
+    obj.effect("ägëÂó¶", "X", 100+obj.track1*t, "Y", 100+obj.track0*t)
+elseif t < (a+b+c) then
+    t = (t-a-b)/c
+    obj.effect("ägëÂó¶", "X", 100+obj.track2*t)
+else
+    return
+end
+

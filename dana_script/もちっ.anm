@@ -1,0 +1,31 @@
+--track0:Šg‘å—¦1,-100,100,15
+--track1:Šg‘å—¦2,-100,100,-15
+--track2:Šg‘å—¦3,-100,100,-10
+--track3:ŒJ‚è•Ô‚µ,-1,100,1,1
+--dialog:’·‚³1,local a=0.3;’·‚³2,local b=0.4;’·‚³3,local c=0.4;ŒJ‚è•Ô‚µŠÔŠu,local d=0;ŒÂ•ÊƒIƒuƒWƒFŠÔŠu,local e=0.3;‘«Œ³,pos={0,0};
+
+obj.setanchor("pos", 1)
+local foot = pos[2]
+
+local t = math.max(0, obj.time-obj.index*e)
+local n = math.ceil(t/(a+b+c+d))
+if obj.track3 >= 0 and n > obj.track3 then
+    return
+end
+t = t % (a+b+c+d)
+
+obj.cy = obj.cy+foot
+obj.oy = obj.oy+foot
+
+if t < a then
+    t = t/a
+    obj.effect("Šg‘å—¦", "X", 100+obj.track0*t, "Y", 100+obj.track1*t)
+elseif t < (a+b) then
+    t = 1-(t-a)/b
+    obj.effect("Šg‘å—¦", "X", 100+obj.track1*t, "Y", 100+obj.track0*t)
+elseif t < (a+b+c) then
+    t = (t-a-b)/c
+    obj.effect("Šg‘å—¦", "X", 100+obj.track2*t)
+else
+    return
+end

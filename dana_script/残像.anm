@@ -1,0 +1,36 @@
+
+--track0:時間,0,100,1
+--track1:数,0,100,1,1
+--track2:透明度初項,0,100,80
+--track3:透明度公比,0,100,80
+--dialog:ブレンドモード,local blend="alpha_max"
+
+local z = obj.getvalue("zoom")/100
+
+local target = {
+    "x","y","z","rx","ry","rz"
+}
+
+local zanzou = {}
+
+obj.setoption("drawtarget","tempbuffer",obj.screen_w,obj.screen_h)
+obj.setoption("blend",blend)
+obj.copybuffer("cache:body","obj")
+
+for j = 0, obj.track1-1 do
+    local time = obj.track0*(obj.track1-j)/obj.track1
+    local alpha = (obj.track2/100*(obj.track3/100)^(obj.track1-j))
+    for i = 1, 6 do
+        local t = obj.time - time
+        t = t > 0 and t or 0
+        zanzou[target[i]] = obj.getvalue(target[i],t)
+    end
+    obj.draw(zanzou.x,zanzou.y,zanzou.z,z,alpha,zanzou.rx,zanzou.ry,zanzou.rz)
+end
+
+obj.copybuffer("obj","tmp")
+obj.setoption("drawtarget","framebuffer")
+obj.setoption("blend",0)
+obj.draw(-obj.x,-obj.y,-obj.z,1/z,1,-obj.rx,-obj.ry,-obj.rz)
+obj.setoption("draw_state",false)
+obj.copybuffer("obj","cache:body")

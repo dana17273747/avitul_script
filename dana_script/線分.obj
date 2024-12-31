@@ -1,0 +1,33 @@
+
+--track0:始点太さ,0,1000,10
+--track1:終点太さ,0,1000,10
+--track2:始点位置,0,100,0
+--track3:終点位置,0,100,100
+--check0:反転有,0
+
+--dialog:色/col,local col=0xffffff;アンカー,pos={-100,0,100,0};
+
+obj.setanchor("pos",2)
+
+local vec = { pos[3]-pos[1] , pos[4]-pos[2] }
+local l = vec[1]^2 + vec[2]^2
+l = l ^ 0.5
+
+local r1,r2 = obj.track2/100,1-obj.track3/100
+local l1,l2
+l1 = (1-r1)*(-l/2)+r1*l/2
+l2 = (1-r2)*l/2+r2*(-l/2)
+
+local t = math.max(obj.track0,obj.track1)
+obj.setoption("drawtarget","tempbuffer",l,t)
+
+if obj.check0 or ( obj.track3 - obj.track2 > 0 ) then
+    obj.load("figure","四角形",col,1)
+    obj.drawpoly(l1,-obj.track0/2,0,l2,-obj.track1/2,0,l2,obj.track1/2,0,l1,obj.track0/2,0)
+end
+
+obj.load("tempbuffer")
+
+obj.ox = (pos[1]+pos[3])/2
+obj.oy = (pos[2]+pos[4])/2
+obj.rz = obj.rz + math.atan2(vec[2],vec[1])*180/math.pi

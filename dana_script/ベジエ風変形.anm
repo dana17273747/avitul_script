@@ -1,0 +1,184 @@
+--track0:点の数,3,16,3,1
+--track1:伸縮率,0,100,100
+--track3:拡大率X,0,100,100
+--dialog:点,p={};分割数,local dn=32;
+--check0:ループ
+
+local sqrt = math.sqrt
+
+-- ベクトルの正規化
+local normalizeVector = function(x, y)
+    local size = sqrt(x * x + y * y)
+    return x / size, y / size
+end
+
+local pn = obj.track0
+-- ベジエ曲線の数
+local bn = obj.check0 and pn or (pn - 2)
+local w, h = obj.w, obj.h
+local r = obj.track1 / 100 * bn
+local zx = obj.track3 / 100
+
+local zoom = obj.getvalue("zoom") / 100
+obj.setoption("drawtarget", "tempbuffer", obj.screen_w / zoom, obj.screen_h / zoom)
+obj.setoption("blend", "alpha_max")
+
+if #p == 0 then
+    for i = 1, pn, 1 do
+        p[2 * i - 1] = 0
+        p[2 * i] = h * (i - 1) / (pn - 1) - h / 2
+    end
+end
+
+obj.setanchor("p", pn, obj.check0 and "loop" or "line")
+
+if obj.track1 == 0 then
+    obj.setoption("draw_state", true)
+    return
+end
+
+local p_ = {}
+
+for i = 1, pn do
+    p_[2 * i - 1] = p[2 * (pn - i) + 1]
+    p_[2 * i] = p[2 * (pn - i) + 2]
+end
+
+-- ベジエ曲線の制御点リスト
+local bezs = {}
+
+if obj.check0 then
+    local x_start, y_start = (p_[1] + p_[2 * pn - 1]) / 2, (p_[2] + p_[2 * pn]) / 2
+    for i = 1, pn - 1 do
+        local x_end, y_end = (p_[2 * i - 1] + p_[2 * i + 1]) / 2, (p_[2 * i] + p_[2 * i + 2]) / 2
+        table.insert(bezs, { x_start, y_start, p_[2 * i - 1], p_[2 * i], x_end, y_end })
+        x_start, y_start = x_end, y_end
+    end
+    local x_end, y_end = (p_[1] + p_[2 * pn - 1]) / 2, (p_[2] + p_[2 * pn]) / 2
+    -- 最後のベジエ曲線
+    table.insert(bezs, { x_start, y_start, p_[2 * pn - 1], p_[2 * pn], x_end, y_end })
+else
+    -- 点1の座標、最初はそのまま
+    local x_start, y_start = p_[1], p_[2]
+
+    for i = 1, pn - 2 do
+        -- 現在の制御点
+        local x0, y0 = p_[2 * i + 1], p_[2 * i + 2]
+        -- 次の制御点
+        local x1, y1 = p_[2 * i + 3], p_[2 * i + 4]
+
+        -- 点3の座標、中点を利用
+        local x_end, y_end = (x0 + x1) / 2, (y0 + y1) / 2
+
+        -- ベジエ曲線の3点を追加
+        table.insert(bezs, { x_start, y_start, x0, y0, x_end, y_end })
+
+        -- 次の始点は現在の終点
+        x_start, y_start = x_end, y_end
+    end
+
+    -- 最後の端点(そのまま)
+    bezs[#bezs][5] = p_[2 * pn - 1]
+    bezs[#bezs][6] = p_[2 * pn]
+end
+
+local bezLike = function(n, t)
+    -- bezs テーブルから n 番目のベジエ曲線を取得
+    local bez = bezs[n]
+
+    -- ベジエ曲線の3点を取得
+    local x0, y0 = bez[1], bez[2]
+    local x1, y1 = bez[3], bez[4]
+    local x2, y2 = bez[5], bez[6]
+
+    -- 2次ベジエ曲線の座標を計算
+    local x = (1 - t) ^ 2 * x0 + 2 * (1 - t) * t * x1 + t ^ 2 * x2
+    local y = (1 - t) ^ 2 * y0 + 2 * (1 - t) * t * y1 + t ^ 2 * y2
+
+    return x, y
+end
+
+local bezLikeTangent = function(n, t)
+    -- bezs テーブルから n 番目のベジエ曲線を取得
+    local bez = bezs[n]
+    -- ベジエ曲線の3点を取得
+    local x0, y0 = bez[1], bez[2]
+    local x1, y1 = bez[3], bez[4]
+    local x2, y2 = bez[5], bez[6]
+
+    -- 2次ベジエ曲線の接線ベクトルを計算
+    local dx = 2 * (1 - t) * (x1 - x0) + 2 * t * (x2 - x1)
+    local dy = 2 * (1 - t) * (y1 - y0) + 2 * t * (y2 - y1)
+
+    return normalizeVector(dx, dy)
+end
+
+-- ベジエ曲線をpn分割した点
+local cx0, cy0, cx1, cy1
+-- 上の点における正規化された接線ベクトル
+local dx0, dy0, dx1, dy1
+-- 上の点における正規化された法線ベクトル
+local nx0, ny0, nx1, ny1
+--描画に用いる点をZ順
+local dpx0, dpy0, dpx1, dpy1, dpx2, dpy2, dpx3, dpy3
+
+-- drawpolyの元画像の座標
+local y0, y1
+
+y1 = h
+
+-- 0 <= _r <= r
+local calcNextPoint = function(_r)
+    local _n, _t
+    if _r == bn then
+        _n, _t = bn, 1
+    else
+        _n, _t = math.modf(_r + 1)
+    end
+
+    cx1, cy1 = bezLike(_n, _t)
+    dx1, dy1 = bezLikeTangent(_n, _t)
+    nx1, ny1 = dy1, -dx1
+
+    -- 接線
+    dpx2, dpx3 = cx1 + nx1 * zx * w / 2, cx1 - nx1 * zx * w / 2
+    dpy2, dpy3 = cy1 + ny1 * zx * w / 2, cy1 - ny1 * zx * w / 2
+end
+
+calcNextPoint(0)
+
+for i = 1, bn * dn do
+    local t_ = r * i / (bn * dn)
+
+    dpx0, dpx1 = dpx2, dpx3
+    dpy0, dpy1 = dpy2, dpy3
+    dx0, dy0 = dx1, dy1
+    y0 = y1
+    y1 = h * (bn * dn - i) / (bn * dn)
+
+    calcNextPoint(t_)
+
+    obj.drawpoly(
+        dpx0 - dx0, dpy0 - dy0, 0,
+        dpx1 - dx0, dpy1 - dy0, 0,
+        dpx3 + dx1, dpy3 + dy1, 0,
+        dpx2 + dx1, dpy2 + dy1, 0,
+        0, y0, w, y0, w, y1, 0, y1
+    )
+end
+
+
+obj.setoption("blend", 0)
+
+if obj.getoption("gui") then
+    obj.load("figure", "円", 0xffffff, 10 / zoom)
+    for i = 1, bn do
+        for j = 0, 50 do
+            local x, y = bezLike(i, j / 50)
+            obj.draw(x, y)
+        end
+    end
+end
+
+obj.copybuffer("obj", "tmp")
+obj.setoption("drawtarget", "framebuffer")

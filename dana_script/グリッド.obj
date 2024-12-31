@@ -1,0 +1,61 @@
+--track0:太さ,0,1000,4,1
+--track1:点長さ,0,2000,10,1
+--track2:点間隔,0,2000,10,1
+--check0:出力しない,0
+--dialog:色1/col,local col1=0xffffff;色2/col,local col2=0x000000;色2を透明に/chk,local clear=1;間隔 横,local yoko=100;間隔 縦,local tate=100;横に合わせる/chk,local eq1=1;オフセット 横,local ofsyoko=0;オフセット 縦,local ofstate=0;横に合わせる/chk,local eq2=0;サイズ 横,local w=obj.screen_w;サイズ 縦,local h=obj.screen_h;横に合わせる/chk,local eq3=0;
+
+if obj.check0 and obj.getinfo("saving") then
+    return
+end
+
+if eq1 == 1 then
+    tate = yoko
+end
+if e12 == 1 then
+    ofstate = ofsyoko
+end
+if eq3 == 1 then
+    h = w
+end
+if obj.track0 == 0 or obj.track1 == 0 then
+    return
+end
+
+local length = math.max(w,h)
+local thickness = obj.track0
+obj.setoption("drawtarget","tempbuffer",length,thickness)
+
+length,thickness = length/2,thickness/2
+w,h = w/2,h/2
+
+if clear ~= 1 then
+    obj.load("figure","四角形",col2,1)
+    obj.drawpoly(
+        -length,-thickness,0,length,-thickness,0,length,thickness,0,-length,thickness,0
+    )
+end
+
+obj.load("figure","四角形",col1,1)
+
+local p = - length
+local l,g = obj.track1,obj.track2
+while(p < length) do
+    obj.drawpoly(p,-thickness,0,p+l,-thickness,0,p+l,thickness,0,p,thickness,0)
+    p = p + l + g
+end
+obj.copybuffer("obj","tmp")
+
+obj.setoption("drawtarget","tempbuffer",obj.screen_w,obj.screen_h)
+ofsyoko,ofstate = ofsyoko%(thickness+yoko),ofstate%(thickness+tate)
+p = -w + ofsyoko
+while(p < w) do
+    obj.draw(p,0,0,1,1,0,0,90)
+    p = p + 2*thickness + yoko
+end
+p = -h + ofstate
+while(p < h) do
+    obj.draw(0,p,0)
+    p = p + 2*thickness + tate
+end
+
+obj.copybuffer("obj","tmp")

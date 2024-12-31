@@ -1,0 +1,15 @@
+--track0:進行度,0,100,0
+--track1:個数,1,1000,10,1
+--track2:サイズ下限,0,100,100
+--track3:時間ばらつき,0,100,10
+--dialog:幅,local w=obj.screen_w;高さ,local h=obj.screen_h;シード1,local seed1=1;シード2,local seed2=2;シード3,local seed3=3;シード4,local seed4=4;
+
+for i=1,obj.track1 do
+    local x = -w/2+w*obj.rand(0,100,seed1,i)/100
+    local y = -h/2+h*obj.rand(0,100,seed2,i)/100
+    local zoom = obj.rand(obj.track2,100,seed3,i)/100
+    local t = obj.rand(0,obj.track3,seed4,i)
+    t = (obj.track0-t)*100/(100-t)
+    t = t > 0 and t/100 or 0
+    obj.draw(x,y,0,zoom*t)
+end

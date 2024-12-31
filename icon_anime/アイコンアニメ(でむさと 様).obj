@@ -1,0 +1,196 @@
+--track0:アイコンNo.,0,64,1,1
+--track1:差分,1,4,1,1
+--track2:反転,0,3,0,1
+--track3:再生速度,-800,800,100
+--check0:ループ,0
+--dialog:フォルダパス,local path=[[]];アイコン名表示/chk,local dispname=0;
+
+if obj.track0 == 0 then
+    return
+end
+
+local names = {
+    {
+        "01ハテナA_ふきだし_L側\\01ハテナA_ふきだし_rend_00000.png",
+        "01ハテナA_ふきだし_R側\\02ハテナA_ふきだし_反転_rend_00000.png",
+        "01ハテナA2_ハテナだけ_L側\\01ハテナA_ハテナだけ_rend_00004.png",
+        "01ハテナA2_ハテナだけ_R側\\02ハテナA_ハテナだけ_反転_rend_00004.png",
+    },
+    nil,
+    {
+        "03ハテナB_てんてんてん_L側\\03ハテナB_てんてんてん_rend_00000.png",
+        "03ハテナB_てんてんてん_R側\\03ハテナB_てんてんてん_反転_rend_00000.png",
+    },
+    nil,
+    {
+        "05ハテナC_いっぱい_L側\\05ハテナC_いっぱい_rend_00000.png",
+        "05ハテナC_いっぱい_R側\\05ハテナC_いっぱい_反転_rend_00000.png",
+    },
+    nil,
+    {
+        "07ビックリA_ふきだし\\07びっくりマークA_ふきだし_rend_00000.png",
+        "07ビックリA2_ふきだしだけ\\07びっくりマークA2_ビックリだけ_rend_00002.png",
+    },
+    "08ビックリB_落下\\08びっくりマークB_落下_rend_00000.png",
+    {
+        "09ビックリハテナ\\09ビックリハテナ_rend_00000.png",
+        "09ビックリハテナ_はげしくない\\09ビックリハテナ_はげしくない_00000.png",
+    },
+    "10怒りシャープ\\10怒り_rend_00000.png",
+    "11不機嫌ウェーブ\\11不機嫌ウェーブ_rend_00000.png",
+    "12おこサンダー\\12おこサンダー_rend_00001.png",
+    "13ぐるぐるA_ふきだし\\13ぐるぐるA_ふきだし_rend_00000.png",
+    "14ぐるぐるB_竜巻\\14ぐるぐるB_竜巻_rend_00000.png",
+    {
+        "15てんてんてん_L側\\15てんてんてん_rend_00000.png",
+        "15てんてんてん_R側\\15てんてんてん_反転_rend_00000.png",
+    },
+    nil,
+    {
+        "17はずかし_L側\\17はずかし_rend_00000.png",
+        "17はずかし_R側\\17はずかし_反転_rend_00000.png",
+    },
+    nil,
+    "19ほっ吐息\\19ほっ吐息_rend_00000.png",
+    "20バッテンA_正面\\20バッテンA_正面_rend_00000.png",
+    "21バッテンB_角度\\21バッテンB_角度_rend_00006.png",
+    "22あせ\\22_あせ_rend_00000.png",
+    "23あせあせA_ランダム\\23あせあせA_連続_rend_00002.png",
+    "24あせあせB_ストレート\\24_あせあせB_ストレート_rend_00000.png",
+    "25あせあせCワイド\\25_あせあせCワイド_rend_00000.png",
+    "26あせあせD_水滴\\26_あせあせD_水滴_rend_00000.png",
+    "27電球\\27電球_rend_00000.png",
+    "28気づきライン\\28気づきライン_rend_00000.png",
+    "29反応ぽんぽん\\29反応ぽんぽん_rend_00000.png",
+    "30後光\\30後光_rend_00000.png",
+    "31衝撃\\31衝撃_rend_00000.png",
+    "32笑\\32笑_rend_00000.png",
+    {
+        "33にぎやか_10fps\\33にぎやか_10fps_rend_00000.png",
+        "33にぎやか_30fps\\33にぎやか_30fps_rend_00000.png",
+    },
+    {
+        "34はな\\34はな_rend_00000.png",
+        "34はな_白輪郭つき\\34はな_白輪郭つき_00000.png",
+    },
+    "35紙吹雪A_降る\\35紙吹雪A_降る_rend_00000.png",
+    "36紙吹雪B_とびだす\\36紙吹雪B_とびだす_00000.png",
+    "37流れ星\\37流れ星_rend_00000.png",
+    "38きらーん\\38きらーん_rend_00000.png",
+    "39キラキラA_一部\\39キラキラA_一部_rend_00000.png",
+    "40キラキラB_周囲\\40キラキラB_周囲_rend_00000.png",
+    nil,
+    nil,
+    {
+        "43音符A_1個_L側\\43音符A_1個_rend_00000.png",
+        "43音符A_1個_R側\\43音符A_1個_反転_rend_00000.png",
+        "43音符A2_1個_黄色_L側\\43音符A2_1個_黄色_rend_00000.png",
+        "43音符A2_1個_黄色_R側\\43音符A2_1個_黄色_反転_rend_00000.png",
+    },
+    "44音符B_周囲\\44音符B_全体_rend_00000.png",
+    "45ハートA_1個\\45ハートA_単体_rend_00000.png",
+    "46ハートB_3連\\46ハートB_3連_rend_00000.png",
+    "47ハートC_周囲\\47ハートC_周囲_rend_00000.png",
+    "48ハートD_割れ\\48ハートD_割れ_rend_00000.png",
+    {
+        "49nowloading_くろ\\49nowloading_くろ_00000.png",
+        "49nowloading_しろ\\49nowloading_しろ_00000.png",
+    },
+    "50youtube_guruguru\\50youtube_guruguru_rend_00000.png",
+    "51がっかりA_垂直落下\\51_がっかりA_垂直落下_rend_00000.png",
+    {
+        "52がっかりB_ぐねぐね\\52_がっかりB_rend_00000.png",
+        "52がっかりB_ぐねぐね_輪郭付き\\52_がっかりB2_ぐねぐね_輪郭付きrend_00000.png",
+    },
+    {
+        "53眠いA_Zzz_L側\\53眠いA_Zzz_rend_00000.png",
+        "53眠いA_Zzz_R側\\53眠いA_Zzz_反転_rend_00000.png",
+    },
+    {
+        "54眠いA2_Z大文字連続_L側\\54眠いA2_Zzz_大文字15fps_rend_00000.png",
+        "54眠いA2_Z大文字連続_R側\\54眠いA2_Z大文字連続_反転_rend_00000.png",
+    },
+    "55眠いB_Zzz_泡\\55眠いB_泡_rend_00000.png",
+    "56あせり泡\\56あせり泡_rend_00000.png",
+    {
+        "57混乱スター_1回再生\\57混乱スター_playonce_rend_00000.png",
+        "57混乱スター_ループ\\57混乱スター_loop_rend_00000.png",
+    },
+    {
+        "58ピヨり_1回再生\\58ピヨり_playonce_rend_00000.png",
+        "58ピヨり_ループ\\58ピヨり_loop_rend_00000.png"
+    },
+    "59寒い時の風\\59寒いときの風_rend_00001.png",
+    "60おこぷんスモーク\\60おこぷんスモーク_rend_00000.png",
+    "61赤面スモーク\\61赤面スモーク_rend_00000.png",
+    "62ねむけ\\62ねむけ_rend_00000.png",
+    {
+        "63ぶるぶるA\\63ぶるぶるA_rend_00000.png",
+        "63ぶるぶるB\\63ぶるぶるB_rend_00000.png",
+    },
+    "64幽霊\\64幽霊_rend_00000.png"
+}
+
+local path = path
+
+--[[ パスが指定されていない場合はscriptフォルダにあるものとする ]]
+if path == nil or path == "" then
+    local script_path = obj.getinfo("script_path")
+    --[[ script直下でない場合最後のフォルダを外す ]]
+    if not script_path:match([[script\$]]) then
+        script_path = script_path:sub(1, -#script_path:match([[\[^\]+\$]]))
+    end
+    path = script_path.."icon_anime_v2"
+end
+
+local name = names[obj.track0]
+if name == nil then
+    obj.setfont("MS UI Gothic", 32, 3, "0xffffff", "0x000000")
+    obj.load("text", "欠番")
+    return
+end
+if type(name) == "table" then
+    name = name[obj.track1] or name[#name]
+end
+
+local t = obj.time * obj.track3/100
+
+local totaltime = obj.load("movie", path.."\\"..name, t, 1)
+
+if totaltime == nil then
+    obj.setfont("MS UI Gothic", 32, 3, "0xffffff", "0x000000")
+    obj.load("text", "パスが不正です")
+    return
+end
+
+if t < 0 then
+    t = -t
+    obj.load("movie", path.."\\"..name, totaltime-t, 1)
+end
+
+if t > totaltime then
+    if obj.check0 then
+        t = t%totaltime
+        if obj.track3 > 0 then
+            obj.load("movie", path.."\\"..name, t, 1)
+        else
+            obj.load("movie", path.."\\"..name, totaltime-t, 1)
+        end
+    else
+        obj.setoption("draw_state", true)
+    end
+end
+
+if obj.track2 ~= 0 then
+    local a,b = obj.track2 > 1 and 1 or 0 , obj.track2%2
+    obj.effect("反転","上下反転",a,"左右反転",b)
+end
+
+if dispname == 1 and obj.getoption("gui") then
+    obj.copybuffer("tmp", "obj")
+    obj.setoption("drawtarget", "tempbuffer")
+    obj.setfont("MS UI Gothic", 32, 3, "0xffffff", "0x000000")
+    obj.load("text", string.sub(name, 1, string.find(name, "\\") - 1))
+    obj.draw()
+    obj.copybuffer("obj", "tmp")
+end

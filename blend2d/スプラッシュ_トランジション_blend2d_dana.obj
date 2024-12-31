@@ -1,0 +1,85 @@
+--track0:進行,0,100,1
+--track1:シード値,-1000,1000,0,1
+--track2:サイズ,0,500,100
+--track3:色数,1,8,4,1
+--dialog:色/col,local c1=0xffffff;色/col,local c2=0xffffff;色/col,local c3=0xffffff;色/col,local c4=0xffffff;色/col,local c5=0xffffff;色/col,local c6=0xffffff;色/col,local c7=0xffffff;色/col,local c8=0xffffff;
+
+local ffi = require("ffi")
+local C = ffi.C
+local BLAviUtl = require("blend2d_aviutl")
+local bez = require("bez")
+
+local w,h = obj.screen_w, obj.screen_h
+local rcount = 0
+local rand = function(seed)
+    rcount = rcount+1
+    return obj.rand(0,10000,seed,rcount)/10000
+end
+local sin,cos,pi = math.sin,math.cos,math.pi
+
+local colors = {c1, c2, c3, c4, c5 or 0xffffff, c6 or 0xffffff, c7 or 0xffffff, c8 or 0xffffff}
+local cn = obj.track3
+local m = math.ceil(obj.track0)
+-- しぶきの中心部のサイズ
+local r = obj.track2
+-- しぶきのひだのサイズ
+local l = obj.track2
+-- しぶきのひだの個数
+local num = 11
+
+-- シード値
+local s = obj.track1
+-- 角度ランダム
+local rr = 0.3
+-- 長さランダム
+local lr = 1
+-- しぶきのひだ一つ当たりの角度
+local rad1 = 2*pi/num
+-- しぶき一つを4つにわけて描画に用いる
+local rad2 = rad1/4
+
+obj.setoption("drawtarget", "tempbuffer", w, h)
+obj.copybuffer("obj", "tmp")
+local bl, data = BLAviUtl(obj)
+obj.setoption("blend", "alpha_max")
+
+for i = 1, m do
+
+    local t = i == m and math.fmod(obj.track0, 1) or 1
+    t = (i == m and t == 0) and 1 or t
+
+    t = t == 1 and 1 or 1 - math.pow(2, -10 * t)
+
+    local p = {}
+
+    local ox = w * rand(s)
+    local oy = h * rand(s)
+
+    for i = 0, num-1 do
+        local rad = rad1 * (i + rr*(rand(s)-0.5))
+        local l_ = l * (1 + lr*(rand(s) - 0.5))
+        local r2 = l_/4
+        p[10*i+1 ] = r*cos(rad - (1-t)*rad1/3) + ox
+        p[10*i+2 ] = r*sin(rad - (1-t)*rad1/3) + oy
+        p[10*i+3 ] = (r+t*l_)*cos(rad-rad2) + ox
+        p[10*i+4 ] = (r+t*l_)*sin(rad-rad2) + oy
+        p[10*i+5 ] = (r+t*(l_+r2))*cos(rad) + ox
+        p[10*i+6 ] = (r+t*(l_+r2))*sin(rad) + oy
+        p[10*i+7 ] = (r+t*l_)*cos(rad+rad2) + ox
+        p[10*i+8 ] = (r+t*l_)*sin(rad+rad2) + oy
+        p[10*i+9 ] = r*cos(rad + (1-t)*rad1/3) + ox
+        p[10*i+10] = r*sin(rad + (1-t)*rad1/3) + oy
+
+        bl:color(0x1000000 * 0xff + colors[math.min(math.ceil(rand(s) * (cn+1)), cn)])
+        local curve = bez(p, true, 0.5)
+
+        bl:curve(curve, 50*num)
+
+        bl:fill(C.BL_FILL_RULE_NON_ZERO)
+        bl:clear()
+    end
+
+
+end
+
+obj.putpixeldata(data)

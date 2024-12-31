@@ -1,0 +1,70 @@
+
+--track0:U•,0,500,5
+--track1:Šp“x,0,180,10
+--track2:ŠÔŠu,0,100,0
+--track3:Žc‘œ’x‰„,0,100,100
+
+--dialog:“§–¾“xŽÀ‘œ,local a=10;“§–¾“xŽc‘œ,local a_=50;ŽÀ‘œ‡¬ƒ‚[ƒh,local mo=0;
+
+local w,h = obj.getpixel()
+w = math.max(w,h)
+obj.setoption("drawtarget","tempbuffer",w+2*obj.track0,w+2*obj.track0)
+
+local x,y,rz,x_,y_,rz_
+
+if obj.track2 == 0  then
+	x = obj.rand(-obj.track0,obj.track0,0,obj.frame+1)
+	y = obj.rand(-obj.track0,obj.track0,1,obj.frame+1)
+	rz = obj.rand(-obj.track1,obj.track1,2,obj.frame+1)
+	x_ = obj.rand(-obj.track0,obj.track0,0)
+	y_ = obj.rand(-obj.track0,obj.track0,1)
+	rz_ = obj.rand(-obj.track1,obj.track1,2)
+else
+	local t = obj.time*100/obj.track2
+	local p = math.floor(t)
+    local t_ = t - obj.track2*obj.track3/10000
+	t_ = t_ > 0 and t_ or 0
+    t = t-p
+
+	local x0 = obj.rand(-1000,1000,0,p+0)/1000*obj.track0
+	local x1 = obj.rand(-1000,1000,0,p+1)/1000*obj.track0
+	local x2 = obj.rand(-1000,1000,0,p+2)/1000*obj.track0
+	local x3 = obj.rand(-1000,1000,0,p+3)/1000*obj.track0
+	local x4 = obj.rand(-1000,1000,0,p+4)/1000*obj.track0
+	local y0 = obj.rand(-1000,1000,1,p+0)/1000*obj.track0
+	local y1 = obj.rand(-1000,1000,1,p+1)/1000*obj.track0
+	local y2 = obj.rand(-1000,1000,1,p+2)/1000*obj.track0
+	local y3 = obj.rand(-1000,1000,1,p+3)/1000*obj.track0
+	local y4 = obj.rand(-1000,1000,0,p+4)/1000*obj.track0
+	local r0 = obj.rand(-1000,1000,2,p+0)/1000*obj.track1
+	local r1 = obj.rand(-1000,1000,2,p+1)/1000*obj.track1
+	local r2 = obj.rand(-1000,1000,2,p+2)/1000*obj.track1
+	local r3 = obj.rand(-1000,1000,2,p+3)/1000*obj.track1
+	local r4 = obj.rand(-1000,1000,0,p+4)/1000*obj.track1
+
+    t_ = t_-p + 1
+    if t_ > 1 then
+        t_ = t_-1
+        x_ ,y_  = obj.interpolation(t_,x1,y1,x2,y2,x3,y3,x4,y4)
+        rz_  = obj.interpolation(t_,r1,r2,r3,r4)
+    else
+	    x_,y_ = obj.interpolation(t_,x0,y0,x1,y1,x2,y2,x3,y3)
+    	rz_ = obj.interpolation(t_,r0,r1,r2,r3)
+    end
+    x ,y  = obj.interpolation(t,x1,y1,x2,y2,x3,y3,x4,y4)
+    rz  = obj.interpolation(t,r1,r2,r3,r4)
+end
+
+local al_,al = (100-a_)/100,(100-a)/100
+
+obj.draw(x_,y_,0,1,al_,0,0,rz_)
+
+if mo ~= nil or mo ~= 0 then
+	obj.setoption("blend",mo)
+end
+
+obj.draw(x,y,0,1,al,0,0,rz)
+
+obj.copybuffer("obj","tmp")
+obj.setoption("drawtarget","framebuffer")
+
